@@ -179,10 +179,12 @@ func TestParsingPrefixExpression(t *testing.T) {
 	prefixTests := []struct {
 		input string
 		operator string
-		intergerValue int64
+		intergerValue interface{}
 	}{
 		{"!5;", "!", 5},
 		{"-15;", "-", 15},
+		{"!true", "!", true},
+		{"!false", "!", false},
 	}
 
 	for _, tt := range prefixTests {
@@ -209,7 +211,7 @@ func TestParsingPrefixExpression(t *testing.T) {
 			t.Fatalf("exp.Operator not '%s'. got=%s",
 				tt.operator, exp.Operator)
 		}
-		if !testIntegerLiteral(t, exp.Right, tt.intergerValue) {
+		if !testLiteralExpression(t, exp.Right, tt.intergerValue) {
 			return
 		}
 	}
@@ -282,9 +284,9 @@ func testIntegerLiteral(t *testing.T, il ast.Expression, value int64) bool {
 func TestParsingInflixExpression(t *testing.T) {
 	infixTests := []struct {
 		input string
-		leftValue int64
+		leftValue interface{}
 		operator string
-		rightValue int64
+		rightValue interface{}
 	}{
 		{"5 + 5", 5, "+", 5},
 		{"5 - 5", 5, "-", 5},
@@ -294,6 +296,9 @@ func TestParsingInflixExpression(t *testing.T) {
 		{"5 < 5", 5, "<", 5},
 		{"5 == 5", 5, "==", 5},
 		{"5 != 5", 5, "!=", 5},
+		{"true == true", true, "==", true},
+		{"true != false", true, "!=", false},
+		{"false == false", false, "==", false},
 	}
 
 	for _, tt := range infixTests {
@@ -318,7 +323,7 @@ func TestParsingInflixExpression(t *testing.T) {
 			t.Fatalf("exp is not ast.InflixExpression. got=%T", stmt.Expression)
 		}
 
-		if !testIntegerLiteral(t, exp.Left, tt.leftValue) {
+		if !testLiteralExpression(t, exp.Left, tt.leftValue) {
 			return
 		}
 
@@ -327,7 +332,7 @@ func TestParsingInflixExpression(t *testing.T) {
 				tt.operator, exp.Operator)
 		}
 
-		if !testIntegerLiteral(t, exp.Right, tt.rightValue) {
+		if !testLiteralExpression(t, exp.Right, tt.rightValue) {
 			return
 		}
 	}
