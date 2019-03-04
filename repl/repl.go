@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/logie17/fun/evaluator"
 	"github.com/logie17/fun/lexer"
 	"github.com/logie17/fun/parser"
 )
@@ -32,8 +33,14 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		// io.WriteString(out, program.String())
+		// io.WriteString(out, "\n")
+
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 	}
 }
 
